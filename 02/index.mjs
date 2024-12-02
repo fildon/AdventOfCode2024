@@ -26,6 +26,19 @@ export const solvePart1 = (inputLines) =>
     .map((line) => line.split(" ").map((numStr) => parseInt(numStr)))
     .filter(reportIsSafe).length;
 
-export const solvePart2 = () => {
-  // TODO
-};
+const reportIsSafeWithDampener = (report) =>
+  [
+    // We prepend the original report here since it might already be safe without dampening
+    report,
+    // Generate every possible dampened report
+    ...Array.from({ length: report.length })
+      .fill(0)
+      .map((_, i) => [...report.slice(0, i), ...report.slice(i + 1)]),
+  ]
+    // This report is safe if at least one version is safe
+    .some(reportIsSafe);
+
+export const solvePart2 = (inputLines) =>
+  inputLines
+    .map((line) => line.split(" ").map((numStr) => parseInt(numStr)))
+    .filter(reportIsSafeWithDampener).length;

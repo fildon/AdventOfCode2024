@@ -13,10 +13,10 @@ describe("Day 02", () => {
     test("real input", () =>
       strictEqual(solvePart1(getInputStrings("./02/input-real.txt")), 502));
   });
-  describe.skip("Part 02", () => {
+  describe("Part 02", () => {
     test("test input", () =>
-      strictEqual(solvePart2(getInputStrings("./02/input-test.txt")), -1));
+      strictEqual(solvePart2(getInputStrings("./02/input-test.txt")), 4));
     test("real input", () =>
-      strictEqual(solvePart2(getInputStrings("./02/input-real.txt")), -1));
+      strictEqual(solvePart2(getInputStrings("./02/input-real.txt")), 544));
   });
 });
