@@ -13,20 +13,26 @@ export const solvePart1 = (inputLines) =>
  */
 export const solvePart2 = (inputLines) => {
   const input = inputLines.join("/n");
-  const dos = [...input.matchAll(/do\(\)/g)].map((match) => match.index);
-  const donts = [...input.matchAll(/don't\(\)/g)].map((match) => match.index);
+  const dos = [...input.matchAll(/do\(\)/g)].map(({ index }) => ({
+    type: "do",
+    index,
+  }));
+  const donts = [...input.matchAll(/don't\(\)/g)].map(({ index }) => ({
+    type: "dont",
+    index,
+  }));
+  const commands = [...dos, ...donts].sort((a, b) => a.index - b.index);
 
   const matches = [...input.matchAll(/mul\((\d+),(\d+)\)/g)].filter((match) => {
     // Include this match if it is prior to any dont command
-    if (match.index < donts[0]) return true;
+    if (match.index < commands[0].index) return true;
     // Otherwise we need to check whether a do or dont was most recent
-    const mostRecentDo = dos.filter((doIndex) => doIndex < match.index).at(-1);
-    const mostRecentDont = donts
-      .filter((dontIndex) => dontIndex < match.index)
+    const mostRecentCommand = commands
+      .filter((command) => command.index < match.index)
       .at(-1);
 
-    // We most recently saw a do command
-    return mostRecentDo > mostRecentDont;
+    // Include this match only if the most recent command was a "do"
+    return mostRecentCommand.type === "do";
   });
 
   return matches
