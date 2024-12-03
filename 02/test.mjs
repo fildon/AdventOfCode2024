@@ -7,7 +7,7 @@ import { getInputStrings } from "../utils.mjs";
 import { solvePart1, solvePart2 } from "./index.mjs";
 
 describe("Day 02", () => {
-  describe("Part 02", () => {
+  describe("Part 01", () => {
     test("test input", () =>
       strictEqual(solvePart1(getInputStrings("./02/input-test.txt")), 2));
     test("real input", () =>
