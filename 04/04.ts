@@ -1,7 +1,9 @@
+type Vector = [number, number];
+
 /**
  * The 8 unit vectors. 4 cardinals + 4 diagonals.
  */
-const directions = [
+const directions: Vector[] = [
   [1, 0],
   [1, 1],
   [0, 1],
@@ -12,19 +14,10 @@ const directions = [
   [1, -1],
 ];
 
-const isXMAS = (
-  wordSearch: string[],
-  [x, y]: [number, number],
-  [dx, dy]: (typeof directions)[number]
-) => {
-  if (wordSearch[y]?.[x] !== "X") return false;
-  if (wordSearch[y + dy]?.[x + dx] !== "M") return false;
-  if (wordSearch[y + dy + dy]?.[x + dx + dx] !== "A") return false;
-  if (wordSearch[y + dy + dy + dy]?.[x + dx + dx + dx] !== "S") return false;
-  return true;
-};
+const isXMAS = (wordSearch: string[], [x, y]: Vector, [dx, dy]: Vector) =>
+  [..."XMAS"].every((char, i) => wordSearch[y + i * dy]?.[x + i * dx] === char);
 
-const countXMASes = (wordSearch: string[], location: [number, number]) =>
+const countXMASes = (wordSearch: string[], location: Vector) =>
   directions.filter((dir) => isXMAS(wordSearch, location, dir)).length;
 
 export const solvePart1 = (inputLines: string[]) =>
@@ -34,7 +27,7 @@ export const solvePart1 = (inputLines: string[]) =>
     )
     .reduce((acc, curr) => acc + curr);
 
-const isCrossMAS = (wordSearch: string[], [x, y]: [number, number]) => {
+const isCrossMAS = (wordSearch: string[], [x, y]: Vector) => {
   if (wordSearch[y]?.[x] !== "A") return false;
 
   const topLeft = wordSearch[y - 1]?.[x - 1];
