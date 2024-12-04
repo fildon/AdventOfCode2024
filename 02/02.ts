@@ -1,9 +1,4 @@
-// @ts-check
-
-/**
- * @param {number[]} report
- */
-const reportIsSafe = (report) => {
+const reportIsSafe = (report: number[]) => {
   const expectedDirection = report[0] < report[1];
 
   for (let i = 1; i < report.length; i++) {
@@ -20,15 +15,12 @@ const reportIsSafe = (report) => {
   return true;
 };
 
-/**
- * @param {string[]} inputLines
- */
-export const solvePart1 = (inputLines) =>
+export const solvePart1 = (inputLines: string[]) =>
   inputLines
     .map((line) => line.split(" ").map((numStr) => parseInt(numStr)))
     .filter(reportIsSafe).length;
 
-const reportIsSafeWithDampener = (report) =>
+const reportIsSafeWithDampener = (report: number[]) =>
   [
     // We prepend the original report here since it might already be safe without dampening
     report,
@@ -40,7 +32,7 @@ const reportIsSafeWithDampener = (report) =>
     // This report is safe if at least one version is safe
     .some(reportIsSafe);
 
-export const solvePart2 = (inputLines) =>
+export const solvePart2 = (inputLines: string[]) =>
   inputLines
     .map((line) => line.split(" ").map((numStr) => parseInt(numStr)))
     .filter(reportIsSafeWithDampener).length;
