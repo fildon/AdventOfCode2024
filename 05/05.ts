@@ -42,3 +42,38 @@ export const solvePart1 = (inputLines: string[]) => {
 
   return validUpdates.map(middle).reduce((acc, curr) => acc + curr);
 };
+
+export const solvePart2 = (inputLines: string[]) => {
+  const emptyLineIndex = inputLines.indexOf("");
+
+  const constraints = inputLines.slice(0, emptyLineIndex).map(
+    (constraintStr) =>
+      // Naughty type-cast here, because we know we always get 2 parts
+      constraintStr.split("|").map((part) => parseInt(part)) as Constraint
+  );
+
+  const updates = inputLines
+    .slice(emptyLineIndex + 1)
+    .map((updateStr) => updateStr.split(",").map((numStr) => parseInt(numStr)));
+
+  const invalidUpdates = updates.filter(
+    (update) => !updateIsValid(update, constraints)
+  );
+
+  return invalidUpdates
+    .map((update) =>
+      update.toSorted((a, b) => {
+        const matchingConstraint = constraints.find(
+          (constraint) => constraint.includes(a) && constraint.includes(b)
+        );
+        // Preserve order if no constraint applies
+        if (!matchingConstraint) return -1;
+
+        // Otherwise put a before b if and only if a is the "lesser" of the constraint
+        const [lesser] = matchingConstraint;
+        return a === lesser ? -1 : 1;
+      })
+    )
+    .map(middle)
+    .reduce((acc, curr) => acc + curr);
+};
