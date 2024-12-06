@@ -43,7 +43,7 @@ const turnRight = (dir: Direction): Direction => {
   return "N";
 };
 
-export const solvePart1 = (inputLines: string[]) => {
+const getVisitedSet = (inputLines: string[]) => {
   const guard = findGuard(inputLines);
   const visited = new Set<string>();
 
@@ -58,8 +58,11 @@ export const solvePart1 = (inputLines: string[]) => {
     }
   }
 
-  return visited.size;
+  return visited;
 };
+
+export const solvePart1 = (inputLines: string[]) =>
+  getVisitedSet(inputLines).size;
 
 const willLoop = (map: string[]) => {
   const guard = findGuard(map);
@@ -96,12 +99,13 @@ const createMapWithObstacleAt = (map: string[], row: number, col: number) => {
 };
 
 export const solvePart2 = (inputLines: string[]) => {
+  const visitedSet = getVisitedSet(inputLines);
   let loops = 0;
-  for (let row = 0; row < inputLines.length; row++) {
-    for (let col = 0; col < inputLines[0].length; col++) {
-      if (inputLines[row][col] === ".") {
-        if (willLoop(createMapWithObstacleAt(inputLines, row, col))) loops++;
-      }
+
+  for (let visited of visitedSet) {
+    const [row, col] = visited.split(",").map((x) => parseInt(x));
+    if (inputLines[row][col] === ".") {
+      if (willLoop(createMapWithObstacleAt(inputLines, row, col))) loops++;
     }
   }
 
