@@ -60,3 +60,50 @@ export const solvePart1 = (inputLines: string[]) => {
 
   return visited.size;
 };
+
+const willLoop = (map: string[]) => {
+  const guard = findGuard(map);
+  const states = new Set<string>();
+
+  while (isInMap(map, guard.row, guard.col)) {
+    const newState = `${guard.dir},${guard.row},${guard.col}`;
+    // We have looped
+    if (states.has(newState)) return true;
+
+    states.add(newState);
+    const { row, col } = getNextLocation(guard);
+    if (map[row]?.[col] === "#") {
+      guard.dir = turnRight(guard.dir);
+    } else {
+      guard.row = row;
+      guard.col = col;
+    }
+  }
+
+  // The guard left the map
+  return false;
+};
+
+const createMapWithObstacleAt = (map: string[], row: number, col: number) => {
+  return [
+    ...map.slice(0, row),
+    map[row]
+      .split("")
+      .map((x, i) => (i === col ? "#" : x))
+      .join(""),
+    ...map.slice(row + 1),
+  ];
+};
+
+export const solvePart2 = (inputLines: string[]) => {
+  let loops = 0;
+  for (let row = 0; row < inputLines.length; row++) {
+    for (let col = 0; col < inputLines[0].length; col++) {
+      if (inputLines[row][col] === ".") {
+        if (willLoop(createMapWithObstacleAt(inputLines, row, col))) loops++;
+      }
+    }
+  }
+
+  return loops;
+};
