@@ -12,83 +12,75 @@ const findAntennas = (inputLines: string[]): Array<Antenna> =>
       .filter(({ frequency }) => frequency !== ".")
   );
 
-const findAntinodes = (
-  antennas: Array<Antenna>,
-  width: number,
-  height: number
-): Set<string> => {
-  const frequencies = new Set(antennas.map(({ frequency }) => frequency));
-
-  const antinodes = new Set<string>();
-  frequencies.forEach((targetFrequency) => {
-    const matchingAntennas = antennas.filter(
-      ({ frequency }) => frequency === targetFrequency
-    );
-    const pairs: Array<[Antenna, Antenna]> = [];
-    for (let i = 0; i < matchingAntennas.length; i++) {
-      for (let j = 0; j < matchingAntennas.length; j++) {
-        if (i === j) continue;
-        pairs.push([matchingAntennas[i], matchingAntennas[j]]);
-      }
-    }
-    pairs.forEach(([a, b]) => {
-      const row = a.row + 2 * (b.row - a.row);
-      const col = a.col + 2 * (b.col - a.col);
-      // discard if it would fall out of bounds
-      if (row >= 0 && row < height && col >= 0 && col < width) {
-        antinodes.add(`${row},${col}`);
-      }
-    });
-  });
-  return antinodes;
-};
-
 export const solvePart1 = (inputLines: string[]): number => {
+  const height = inputLines.length;
+  const width = inputLines[0].length;
   const antennas = findAntennas(inputLines);
-  const antinodes = findAntinodes(
-    antennas,
-    inputLines[0].length,
-    inputLines.length
+  const pairs = antennas.flatMap((a, i) =>
+    antennas
+      // Don't match an antenna to itself
+      .filter((_, j) => i !== j)
+      // Match only with common frequencies
+      .filter((b) => a.frequency === b.frequency)
+      // Produce the pair
+      .map((b) => [a, b])
   );
 
-  return antinodes.size;
+  const antinodes = pairs
+    .map(([a, b]) => ({
+      row: a.row + 2 * (b.row - a.row),
+      col: a.col + 2 * (b.col - a.col),
+    }))
+    // Exclude antinodes that would fall out of bounds
+    .filter(({ row }) => row >= 0)
+    .filter(({ col }) => col >= 0)
+    .filter(({ row }) => row < height)
+    .filter(({ col }) => col < width);
+
+  return new Set(antinodes.map(({ row, col }) => `${row},${col}`)).size;
+};
+
+const findAntinodesInbounds = (
+  a: Antenna,
+  b: Antenna,
+  height: number,
+  width: number
+): Array<{ row: number; col: number }> => {
+  const antinodes: Array<{ row: number; col: number }> = [];
+  const dRow = b.row - a.row;
+  const dCol = b.col - a.col;
+  let pointerRow = b.row;
+  let pointerCol = b.col;
+  while (
+    pointerRow >= 0 &&
+    pointerRow < height &&
+    pointerCol >= 0 &&
+    pointerCol < width
+  ) {
+    antinodes.push({ row: pointerRow, col: pointerCol });
+    pointerRow += dRow;
+    pointerCol += dCol;
+  }
+  return antinodes;
 };
 
 export const solvePart2 = (inputLines: string[]): number => {
   const height = inputLines.length;
   const width = inputLines[0].length;
   const antennas = findAntennas(inputLines);
-  const frequencies = new Set(antennas.map(({ frequency }) => frequency));
+  const pairs = antennas.flatMap((a, i) =>
+    antennas
+      // Don't match an antenna to itself
+      .filter((_, j) => i !== j)
+      // Match only with common frequencies
+      .filter((b) => a.frequency === b.frequency)
+      // Produce the pair
+      .map((b) => [a, b])
+  );
 
-  const antinodes = new Set<string>();
-  frequencies.forEach((targetFrequency) => {
-    const matchingAntennas = antennas.filter(
-      ({ frequency }) => frequency === targetFrequency
-    );
-    const pairs: Array<[Antenna, Antenna]> = [];
-    for (let i = 0; i < matchingAntennas.length; i++) {
-      for (let j = 0; j < matchingAntennas.length; j++) {
-        if (i === j) continue;
-        pairs.push([matchingAntennas[i], matchingAntennas[j]]);
-      }
-    }
-    pairs.forEach(([a, b]) => {
-      const dRow = b.row - a.row;
-      const dCol = b.col - a.col;
-      let pointerRow = b.row;
-      let pointerCol = b.col;
-      while (
-        pointerRow >= 0 &&
-        pointerRow < height &&
-        pointerCol >= 0 &&
-        pointerCol < width
-      ) {
-        antinodes.add(`${pointerRow},${pointerCol}`);
-        pointerRow += dRow;
-        pointerCol += dCol;
-      }
-    });
-  });
+  const antinodes = pairs.flatMap(([a, b]) =>
+    findAntinodesInbounds(a, b, height, width)
+  );
 
-  return antinodes.size;
+  return new Set(antinodes.map(({ row, col }) => `${row},${col}`)).size;
 };
