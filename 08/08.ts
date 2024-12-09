@@ -53,3 +53,42 @@ export const solvePart1 = (inputLines: string[]): number => {
 
   return antinodes.size;
 };
+
+export const solvePart2 = (inputLines: string[]): number => {
+  const height = inputLines.length;
+  const width = inputLines[0].length;
+  const antennas = findAntennas(inputLines);
+  const frequencies = new Set(antennas.map(({ frequency }) => frequency));
+
+  const antinodes = new Set<string>();
+  frequencies.forEach((targetFrequency) => {
+    const matchingAntennas = antennas.filter(
+      ({ frequency }) => frequency === targetFrequency
+    );
+    const pairs: Array<[Antenna, Antenna]> = [];
+    for (let i = 0; i < matchingAntennas.length; i++) {
+      for (let j = 0; j < matchingAntennas.length; j++) {
+        if (i === j) continue;
+        pairs.push([matchingAntennas[i], matchingAntennas[j]]);
+      }
+    }
+    pairs.forEach(([a, b]) => {
+      const dRow = b.row - a.row;
+      const dCol = b.col - a.col;
+      let pointerRow = b.row;
+      let pointerCol = b.col;
+      while (
+        pointerRow >= 0 &&
+        pointerRow < height &&
+        pointerCol >= 0 &&
+        pointerCol < width
+      ) {
+        antinodes.add(`${pointerRow},${pointerCol}`);
+        pointerRow += dRow;
+        pointerCol += dCol;
+      }
+    });
+  });
+
+  return antinodes.size;
+};
