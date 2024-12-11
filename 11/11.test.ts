@@ -10,7 +10,7 @@ describe("Day 11", () => {
       getInputStrings("./11/input-test.txt").then((inputLines) =>
         expect(solvePart1(inputLines)).toBe(55312)
       ));
-    test.only("real input", () =>
+    test("real input", () =>
       getInputStrings("./11/input-real.txt").then((inputLines) =>
         expect(solvePart1(inputLines)).toBe(193269)
       ));
