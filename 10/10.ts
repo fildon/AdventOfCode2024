@@ -38,3 +38,40 @@ export const solvePart1 = (inputLines: string[]) => {
     )
     .reduce((acc, curr) => acc + curr);
 };
+
+export const solvePart2 = (inputLines: string[]) => {
+  const trailMap = inputLines.map((inputLine, row) =>
+    inputLine.split("").map((x, col) => ({
+      row,
+      col,
+      val: parseInt(x),
+      rating: x === "9" ? 1 : 0,
+    }))
+  );
+
+  for (let height = 8; height >= 0; height--) {
+    for (let row = 0; row < inputLines.length; row++) {
+      for (let col = 0; col < inputLines[0].length; col++) {
+        const thisCell = trailMap[row][col];
+        if (thisCell.val === height) {
+          [
+            [row + 1, col],
+            [row, col + 1],
+            [row - 1, col],
+            [row, col - 1],
+          ]
+            .map(([r, c]) => trailMap[r]?.[c])
+            .filter((x) => !!x)
+            .filter((neighbour) => neighbour.val === height + 1)
+            .forEach((neighbour) => (thisCell.rating += neighbour.rating));
+        }
+      }
+    }
+  }
+
+  return trailMap
+    .flatMap((trailLine) =>
+      trailLine.filter((x) => x.val === 0).map((x) => x.rating)
+    )
+    .reduce((acc, curr) => acc + curr);
+};
