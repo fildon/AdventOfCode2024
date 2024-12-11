@@ -20,3 +20,49 @@ export const solvePart1 = (inputLines: string[]) => {
 
   return stones.length;
 };
+
+type Stone = {
+  val: string;
+  age: number;
+};
+
+const memoCache = new Map<string, number>();
+const memoBlink = ({ val, age }: Stone): number => {
+  if (age === 75) return 1;
+
+  const cacheKey = `${val},${age}`;
+  if (memoCache.has(cacheKey)) return memoCache.get(cacheKey)!;
+
+  if (val === "0") {
+    const result = memoBlink({ val: "1", age: age + 1 });
+    memoCache.set(cacheKey, result);
+    return result;
+  }
+
+  if (val.length % 2 === 0) {
+    const result =
+      memoBlink({
+        val: val.slice(0, val.length / 2),
+        age: age + 1,
+      }) +
+      memoBlink({
+        val: `${parseInt(val.slice(val.length / 2))}`,
+        age: age + 1,
+      });
+    memoCache.set(cacheKey, result);
+    return result;
+  }
+
+  const result = memoBlink({
+    val: `${2024 * parseInt(val)}`,
+    age: age + 1,
+  });
+  memoCache.set(cacheKey, result);
+  return result;
+};
+
+export const solvePart2 = (inputLines: string[]) => {
+  let stones = inputLines[0].split(" ").map<Stone>((x) => ({ age: 0, val: x }));
+
+  return stones.map(memoBlink).reduce((acc, curr) => acc + curr);
+};
