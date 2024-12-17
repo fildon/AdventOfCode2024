@@ -101,13 +101,17 @@ export const solvePart2 = (inputLines: string[]) => {
   const width = 101;
   const robots = inputLines.map((inputLine) => new Robot(inputLine));
 
-  const hasNeighbour = (robot: Robot) =>
-    robots.some((other) => other.position.isNeighbourOf(robot.position));
-
-  for (let steps = 0; steps < 101 * 103; steps++) {
+  let steps = 0;
+  while (
+    // While any robot is in the same position as a different robot
+    robots.some((robot, i) =>
+      robots.some(
+        (other, j) => i !== j && robot.position.equals(other.position)
+      )
+    )
+  ) {
     robots.forEach((robot) => robot.advance(1, height, width));
-    const neighbourCount = robots.filter(hasNeighbour).length;
-    if (neighbourCount === 361) return steps + 1;
+    steps++;
   }
-  return 2;
+  return steps;
 };
